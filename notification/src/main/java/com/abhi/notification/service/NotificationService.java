@@ -41,9 +41,9 @@ public class NotificationService {
         log.info("sending mail  {}",transferEvent.toString());
 
         SimpleMailMessage simpleMailMessage=new SimpleMailMessage();
-        simpleMailMessage.setFrom("abhinavkr2272@gmail.com");
+        simpleMailMessage.setFrom("xxxxxxxxxxxx@gmail.com");
         simpleMailMessage.setSubject("Transaction successful");
-        simpleMailMessage.setTo("abhikumarjnvalld@gmail.com");
+        simpleMailMessage.setTo("xxxxxxxx@gmail.com");
         simpleMailMessage.setText(buildEmailBody(transferEvent));
 
         javaMailSender.send(simpleMailMessage);
