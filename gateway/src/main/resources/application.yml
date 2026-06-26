@@ -1,0 +1,79 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/api/auth/**
+
+        - id: wallet-service
+          uri: http://wallet-service:8082
+          predicates:
+            - Path=/api/wallet/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: walletCircuitBreaker
+                fallbackUri: forward:/fallback/wallet
+            - name: JwtAuth
+              statusCodes:
+                - 500
+                - 502
+                - 503
+                - 504
+
+        - id: notification-service
+          uri: http://notification-service:8083
+          predicates:
+            - Path=/api/notification/**
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      walletCircuitBreaker:
+        sliding-window-size: 10
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+  timelimiter:
+    instances:
+      walletCircuitBreaker:
+        timeout-duration: 5s
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}]"
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0   # trace 100% of requests (use lower % in real production)
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+jwt:
+  secret: ${JWT_SECRET:abhinavKumarIsAVeryGoodGuy.HeLovesHerButSheMightNotKnowThatAbhinavLovesHer}
