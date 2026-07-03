@@ -18,8 +18,8 @@ const LoginPage = () => {
   const { login: saveTokens } = useAuth();
 
   const [form, setForm] = useState({
-    email: "",
-    password: "",
+    email: "a@mail.com",
+    password: "123456",
   });
 
   const handleLogin = async () => {
@@ -59,7 +59,7 @@ const LoginPage = () => {
 
         <TextField
           fullWidth
-          type="password"
+          // type="password"
           margin="normal"
           label="Password"
           value={form.password}

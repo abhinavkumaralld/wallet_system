@@ -6,9 +6,18 @@ const WalletCard = ({ wallet }) => {
       <CardContent>
         <Typography variant="h6">Wallet Balance</Typography>
 
-        <Typography variant="h3">₹ {wallet?.balance || 0}</Typography>
-
-        <Typography color="text.secondary">Wallet Id: {wallet?.id}</Typography>
+        {wallet ? (
+          <>
+            <Typography variant="h3">₹ {wallet.balance || 0}</Typography>
+            <Typography color="text.secondary">
+              Wallet Id: {wallet.id}
+            </Typography>
+          </>
+        ) : (
+          <Typography color="text.secondary" mt={1}>
+            No wallet exists yet. Create one to get started.
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );

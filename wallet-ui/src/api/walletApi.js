@@ -2,6 +2,8 @@ import { walletApi } from "./axiosInstance";
 
 export const getWallet = () => walletApi.get("/api/wallet");
 
+export const createWallet = () => walletApi.post("/api/wallet/create");
+
 export const getTransactions = () => walletApi.get("/api/wallet/transactions");
 
 export const deposit = (payload) =>
