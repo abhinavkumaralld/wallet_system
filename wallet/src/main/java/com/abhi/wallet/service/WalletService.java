@@ -26,6 +26,10 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -240,19 +244,19 @@ public class WalletService {
         return mapWalletToWalletResponse(v);
     }
 
-    public List<TransactionResponse> getTransactions(){
+    public Page<TransactionResponse> getTransactions(int page,int size,String sortBy){
         Long userId = Long.valueOf(                   // same as sender userId
                 (String) SecurityContextHolder.getContext()
                         .getAuthentication()
                         .getPrincipal()
         );
         log.info("get transactions {}",userId);
+        Pageable pageable = PageRequest.of(page,size, Sort.by(Sort.Direction.DESC,sortBy));
         Wallet wallet=walletRepository.getByUserId(userId).orElseThrow(()->new ResourceNotFound("wallet not found"));
-        List<Transaction> transactions=transactionRepository.findAllByWalletId(wallet.getId());
+        Page<Transaction> transactions=transactionRepository.findAllByWalletId(wallet.getId(),pageable);
 
-        return transactions.stream()
-                .map((t)->mapTransactionToTransactionResponse(t))
-                .toList();
+        return transactions
+                .map((t)->mapTransactionToTransactionResponse(t));
     }
 
     @Transactional

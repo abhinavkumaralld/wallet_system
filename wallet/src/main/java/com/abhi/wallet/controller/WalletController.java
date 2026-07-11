@@ -10,6 +10,8 @@ import com.abhi.wallet.dto.response.WalletResponse;
 import com.abhi.wallet.service.WalletService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -64,8 +66,12 @@ public class WalletController {
         return ResponseEntity.ok().body(ApiResponse.success(walletService.transfer(transferRequest),"transferred successfully"));}
 
     @GetMapping("/transactions")
-    public ResponseEntity<ApiResponse<List<TransactionResponse>>> getTransactions(){
-        return ResponseEntity.ok().body(ApiResponse.success(walletService.getTransactions(),"transactions fetched successfully"));
+    public ResponseEntity<ApiResponse<Page<TransactionResponse>>> getTransactions(
+            @RequestParam(defaultValue = "10") int page,
+            @RequestParam(defaultValue="0") int size,
+            @RequestParam(defaultValue="createdAt") String sortBy
+    ){
+        return ResponseEntity.ok().body(ApiResponse.success(walletService.getTransactions(page, size, sortBy),"transactions fetched successfully"));
     }
 
 }
