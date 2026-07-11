@@ -16,6 +16,10 @@ const DashboardPage = () => {
   const [wallet, setWallet] = useState(null);
 
   const [transactions, setTransactions] = useState([]);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5);
+  const [rowCount, setRowCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const [depositOpen, setDepositOpen] = useState(false);
 
@@ -29,17 +33,29 @@ const DashboardPage = () => {
 
   const { logout } = useAuth();
 
-  const loadData = async () => {
+  const loadData = async (currentPage = page, currentPageSize = pageSize) => {
     try {
+      setLoading(true);
+
       const walletResponse = await getWallet();
 
-      const transactionResponse = await getTransactions();
+      const transactionResponse = await getTransactions(
+        currentPage,
+        currentPageSize,
+      );
 
       setWallet(walletResponse.data.data);
 
+      const transactionPage = transactionResponse.data.data;
+
       setTransactions(
-        transactionResponse.data.data.map((v, i) => ({ ...v, id: i })),
+        transactionPage.content.map((v) => ({
+          ...v,
+          id: v.referenceId, // or v.id if available
+        })),
       );
+
+      setRowCount(transactionPage.totalElements);
 
       setWalletError("");
     } catch (err) {
@@ -49,11 +65,14 @@ const DashboardPage = () => {
       if (status === 400 && /wallet not exist/i.test(message)) {
         setWallet(null);
         setTransactions([]);
+        setRowCount(0);
         setWalletError("No wallet exists yet. Create one to continue.");
       } else {
         console.error(err);
         setWalletError("Unable to load wallet data right now.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,8 +93,8 @@ const DashboardPage = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    loadData(page, pageSize);
+  }, [page, pageSize]);
 
   return (
     <Box p={3}>
@@ -154,7 +173,18 @@ const DashboardPage = () => {
           Transactions
         </Typography>
 
-        <TransactionGrid rows={transactions} />
+        <TransactionGrid
+          rows={transactions}
+          loading={loading}
+          page={page}
+          pageSize={pageSize}
+          rowCount={rowCount}
+          onPageChange={setPage}
+          onPageSizeChange={(newPageSize) => {
+            setPage(0); // Go back to first page when page size changes
+            setPageSize(newPageSize);
+          }}
+        />
       </Box>
 
       <DepositDialog

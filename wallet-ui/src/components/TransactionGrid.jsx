@@ -33,7 +33,15 @@ const columns = [
   },
 ];
 
-const TransactionGrid = ({ rows }) => {
+const TransactionGrid = ({
+  rows,
+  loading,
+  page,
+  pageSize,
+  rowCount,
+  onPageChange,
+  onPageSizeChange,
+}) => {
   return (
     <div
       style={{
@@ -41,7 +49,28 @@ const TransactionGrid = ({ rows }) => {
         width: "100%",
       }}
     >
-      <DataGrid rows={rows} columns={columns} pageSizeOptions={[5, 10, 20]} />
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        loading={loading}
+        pagination
+        paginationMode="server"
+        rowCount={rowCount}
+        pageSizeOptions={[5, 10, 20]}
+        paginationModel={{
+          page,
+          pageSize,
+        }}
+        onPaginationModelChange={(model) => {
+          if (model.page !== page) {
+            onPageChange(model.page);
+          }
+
+          if (model.pageSize !== pageSize) {
+            onPageSizeChange(model.pageSize);
+          }
+        }}
+      />
     </div>
   );
 };

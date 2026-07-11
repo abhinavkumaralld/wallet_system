@@ -18,3 +18,4 @@ CREATE TABLE transaction (
 
     INDEX idx_transaction_type (type)
 );
+

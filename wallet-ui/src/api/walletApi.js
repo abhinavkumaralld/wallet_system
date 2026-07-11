@@ -4,7 +4,15 @@ export const getWallet = () => walletApi.get("/api/wallet");
 
 export const createWallet = () => walletApi.post("/api/wallet/create");
 
-export const getTransactions = () => walletApi.get("/api/wallet/transactions");
+export const getTransactions = (page, size) => {
+  return walletApi.get("/api/wallet/transactions", {
+    params: {
+      page,
+      size,
+      sortBy: "createdAt",
+    },
+  });
+};
 
 export const deposit = (payload) =>
   walletApi.post("/api/wallet/deposit", payload);
