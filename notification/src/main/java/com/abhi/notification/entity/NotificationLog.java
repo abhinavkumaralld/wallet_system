@@ -2,8 +2,6 @@ package com.abhi.notification.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
-
 import java.time.LocalDateTime;
 
 @Entity
