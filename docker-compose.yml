@@ -84,6 +84,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
       JWT_SECRET: abhinavKumarIsAVeryGoodGuy.HeLovesHerButSheMightNotKnowThatAbhinavLovesHer
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_PROFILES_ACTIVE: docker
     depends_on:
       mysql:
         condition: service_healthy
@@ -102,6 +103,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_PROFILES_ACTIVE: docker
     depends_on:
       mysql:
         condition: service_healthy
@@ -123,6 +125,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_PROFILES_ACTIVE: docker
     depends_on:
       kafka:
         condition: service_healthy
