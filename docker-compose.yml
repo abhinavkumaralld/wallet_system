@@ -1,13 +1,13 @@
 version: "3"
 
 services:
-  # ───────── Infrastructure ─────────
+  # ─── Infrastructure ───────────────────────────
 
   mysql:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: Mypswrdsql@76
     ports:
       - "3306:3306"
     volumes:
@@ -29,7 +29,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
   zipkin:
     image: openzipkin/zipkin:latest
     container_name: zipkin
@@ -72,7 +71,7 @@ services:
       timeout: 10s
       retries: 5
 
-  # ───────── Microservices ─────────
+  # ─── Services ─────────────────────────────────
 
   auth-service:
     build: ./auth
@@ -80,10 +79,11 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
+      JWT_SECRET: abhinavKumarIsAVeryGoodGuy.HeLovesHerButSheMightNotKnowThatAbhinavLovesHer
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
       mysql:
         condition: service_healthy
@@ -96,9 +96,12 @@ services:
     ports:
       - "8082:8082"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/wallet_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
       mysql:
         condition: service_healthy
@@ -115,14 +118,12 @@ services:
     ports:
       - "8083:8083"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      MAIL_USERNAME: ${MAIL_USERNAME}
-      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/notification_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
-      mysql:
-        condition: service_healthy
       kafka:
         condition: service_healthy
       zipkin:
@@ -134,8 +135,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: abhinavKumarIsAVeryGoodGuy.HeLovesHerButSheMightNotKnowThatAbhinavLovesHer
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
     depends_on:
       auth-service:
         condition: service_started
@@ -149,10 +150,29 @@ services:
 volumes:
   mysql_data:
 
-# #  while running locally
+# # while running locally
+
+# version: "3"
 
 # services:
-#   # ───────── Infrastructure ─────────
+#   # ─── Infrastructure ───────────────────────────
+
+#   mysql:
+#     image: mysql:8.0
+#     container_name: mysql
+#     environment:
+#       MYSQL_ROOT_PASSWORD: Mypswrdsql@76
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#       - ./wallet-ui/mysql-init:/docker-entrypoint-initdb.d
+#     healthcheck:
+#       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
 #   redis:
 #     image: redis:7-alpine
 #     container_name: redis
@@ -163,7 +183,6 @@ volumes:
 #       interval: 10s
 #       timeout: 5s
 #       retries: 5
-
 #   zipkin:
 #     image: openzipkin/zipkin:latest
 #     container_name: zipkin
