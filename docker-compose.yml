@@ -1,13 +1,13 @@
 version: "3"
 
 services:
-  # ─── Infrastructure ───────────────────────────
+  # ───────── Infrastructure ─────────
 
   mysql:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: Mypswrdsql@76
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -29,6 +29,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
   zipkin:
     image: openzipkin/zipkin:latest
     container_name: zipkin
@@ -71,7 +72,7 @@ services:
       timeout: 10s
       retries: 5
 
-  # ─── Services ─────────────────────────────────
+  # ───────── Microservices ─────────
 
   auth-service:
     build: ./auth
@@ -79,11 +80,10 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/auth_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
-      JWT_SECRET: abhinavKumarIsAVeryGoodGuy.HeLovesHerButSheMightNotKnowThatAbhinavLovesHer
-      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       mysql:
         condition: service_healthy
@@ -96,12 +96,9 @@ services:
     ports:
       - "8082:8082"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/wallet_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       mysql:
         condition: service_healthy
@@ -118,12 +115,14 @@ services:
     ports:
       - "8083:8083"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/notification_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: Mypswrdsql@76
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     depends_on:
+      mysql:
+        condition: service_healthy
       kafka:
         condition: service_healthy
       zipkin:
@@ -135,8 +134,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      JWT_SECRET: abhinavKumarIsAVeryGoodGuy.HeLovesHerButSheMightNotKnowThatAbhinavLovesHer
-      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET}
     depends_on:
       auth-service:
         condition: service_started
@@ -149,3 +148,60 @@ services:
 
 volumes:
   mysql_data:
+
+# #  while running locally
+
+# services:
+#   # ───────── Infrastructure ─────────
+#   redis:
+#     image: redis:7-alpine
+#     container_name: redis
+#     ports:
+#       - "6379:6379"
+#     healthcheck:
+#       test: ["CMD", "redis-cli", "ping"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   zipkin:
+#     image: openzipkin/zipkin:latest
+#     container_name: zipkin
+#     ports:
+#       - "9411:9411"
+
+#   zookeeper:
+#     image: confluentinc/cp-zookeeper:7.5.0
+#     container_name: zookeeper
+#     environment:
+#       ZOOKEEPER_CLIENT_PORT: 2181
+#     healthcheck:
+#       test: ["CMD", "nc", "-z", "localhost", "2181"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+
+#   kafka:
+#     image: confluentinc/cp-kafka:7.5.0
+#     container_name: kafka
+#     depends_on:
+#       zookeeper:
+#         condition: service_healthy
+#     ports:
+#       - "9092:9092"
+#     environment:
+#       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+#       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#     healthcheck:
+#       test:
+#         [
+#           "CMD",
+#           "kafka-topics",
+#           "--bootstrap-server",
+#           "localhost:9092",
+#           "--list",
+#         ]
+#       interval: 15s
+#       timeout: 10s
+#       retries: 5

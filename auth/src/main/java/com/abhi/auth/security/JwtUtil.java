@@ -2,6 +2,7 @@ package com.abhi.auth.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -10,9 +11,13 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    public String SECRET_KEY="abhinavKumarIsAVeryGoodGuy.HeLovesHerButSheMightNotKnowThatAbhinavLovesHer";
-    public Integer EXPIRATION_TIME=1000*60*5;
-    public Integer REFRESH_EXPIRATION_TIME=1000*60*10;
+
+    @Value("${jwt.secret}")
+    public String SECRET_KEY;
+    @Value("${jwt.access-expiration}")
+    public Integer EXPIRATION_TIME;
+    @Value("${jwt.refresh-expiration}")
+    public Integer REFRESH_EXPIRATION_TIME;
 
     public SecretKey getSecretKey(){
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));

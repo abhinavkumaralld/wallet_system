@@ -1,0 +1,5 @@
+# Database
+spring.datasource.url=jdbc:mysql://localhost:3306/auth_db
+  
+  # Zipkin
+management.zipkin.tracing.endpoint=http://zipkin:9411/api/v2/spans

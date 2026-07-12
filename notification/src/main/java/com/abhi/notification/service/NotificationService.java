@@ -7,6 +7,7 @@ import com.abhi.notification.repository.NotificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,6 +21,11 @@ public class NotificationService {
     NotificationRepository notificationRepository;
 
     private final JavaMailSender javaMailSender;
+
+    @Value("${spring.mail.username}")
+    private  String fromMail;
+    @Value("${spring.mail.to-username}")
+    private  String toMail;
 
     public NotificationService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
@@ -41,9 +47,9 @@ public class NotificationService {
         log.info("sending mail  {}",transferEvent.toString());
 
         SimpleMailMessage simpleMailMessage=new SimpleMailMessage();
-        simpleMailMessage.setFrom("abhinavkr2272@gmail.com");
+        simpleMailMessage.setFrom(fromMail);
         simpleMailMessage.setSubject("Transaction successful");
-        simpleMailMessage.setTo("abhikumarjnvalld@gmail.com");
+        simpleMailMessage.setTo(toMail);
         simpleMailMessage.setText(buildEmailBody(transferEvent));
 
         javaMailSender.send(simpleMailMessage);
