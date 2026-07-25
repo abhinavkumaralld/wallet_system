@@ -5,6 +5,7 @@ import com.abhi.wallet.dto.request.TransferEvent;
 import com.abhi.wallet.dto.request.TransferRequest;
 import com.abhi.wallet.dto.request.WithdrawRequest;
 import com.abhi.wallet.dto.response.TransactionResponse;
+import com.abhi.wallet.dto.response.UserDetailsResponse;
 import com.abhi.wallet.dto.response.WalletResponse;
 import com.abhi.wallet.entity.Transaction;
 import com.abhi.wallet.entity.Wallet;
@@ -47,6 +48,9 @@ public class WalletService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private AuthServiceClient authServiceClient;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -233,13 +237,26 @@ public class WalletService {
 
         transactionRepository.save(transaction);
         transactionRepository.save(transaction1);
+
+        List<UserDetailsResponse> users = authServiceClient
+                .getUserDetailsBatch(userId,
+                        transferRequest.getReceiverUserId());
+
+        log.info("sending from {} to {}",userId,transferRequest.getReceiverUserId());
+        UserDetailsResponse sender   = users.get(0);
+        UserDetailsResponse receiver = users.get(1);
         TransferEvent transferEvent =TransferEvent.builder()
                 .amount(transferRequest.getAmount())
                 .transferredAt(LocalDateTime.now())
                 .referenceId(transferRequest.getReferenceId())
                 .senderUserId(userId)
                 .receiverUserId(transferRequest.getReceiverUserId())
+                .senderEmail(sender.getEmail())
+                .senderName(sender.getName())
+                .receiverEmail(receiver.getEmail())
+                .receiverName(receiver.getName())
                 .build();
+        System.out.println("event "+transferEvent.toString());
         applicationEventPublisher.publishEvent(transferEvent);
         return mapWalletToWalletResponse(v);
     }
