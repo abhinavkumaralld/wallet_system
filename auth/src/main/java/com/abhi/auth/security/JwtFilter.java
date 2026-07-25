@@ -41,22 +41,22 @@ public class JwtFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try{
 
-            String header= request.getHeader("Authorization");
-            System.out.println(header+"jjjjjjjjjjj");
-            if(!header.startsWith("Bearer ")){
-                throw new UnauthorizedException("Header with Bearer token not found");
-            }
-            String token=header.split("Bearer ")[1];
-            if(token==null){
-                throw  new UnauthorizedException("Token not found");
-            }
-            Long userId= Long.valueOf(jwtUtil.getClaims(token).getSubject());
-            if(userId==null){
-                throw  new UnauthorizedException("Token not valid");
-            }
-            if(!jwtUtil.validateToken(token,userId)){
-                throw  new UnauthorizedException("Token not valid");
-            }
+//            String header= request.getHeader("Authorization");
+//            System.out.println(header+"jjjjjjjjjjj");
+//            if(!header.startsWith("Bearer ")){
+//                throw new UnauthorizedException("Header with Bearer token not found");
+//            }
+//            String token=header.split("Bearer ")[1];
+//            if(token==null){
+//                throw  new UnauthorizedException("Token not found");
+//            }
+//            Long userId= Long.valueOf(jwtUtil.getClaims(token).getSubject());
+//            if(userId==null){
+//                throw  new UnauthorizedException("Token not valid");
+//            }
+//            if(!jwtUtil.validateToken(token,userId)){
+//                throw  new UnauthorizedException("Token not valid");
+//            }
 
 //            SKIPPED As WE are not calling any auth api which need jwt validation
 //            UserDetails userDetails=customUserDetailsService.loadUserByUsername(userId);
@@ -65,6 +65,13 @@ public class JwtFilter extends OncePerRequestFilter{
 //            );
 //            token1.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 //            SecurityContextHolder.getContext().setAuthentication(token1);
+
+            // token will be validated at api gateway
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=
+                    new UsernamePasswordAuthenticationToken(
+                            request.getHeader("X-User-Id"),null,null);
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            filterChain.doFilter(request,response);
 
         } catch (Exception e) {
             handlerExceptionResolver.resolveException(request,response,null,e);

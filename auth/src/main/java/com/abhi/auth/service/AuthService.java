@@ -4,6 +4,7 @@ package com.abhi.auth.service;
 import com.abhi.auth.common.Role;
 import com.abhi.auth.dto.request.LoginRequest;
 import com.abhi.auth.dto.request.RegisterRequest;
+import com.abhi.auth.dto.response.UserDetailsResponse;
 import com.abhi.auth.entity.RefreshToken;
 import com.abhi.auth.entity.Token;
 import com.abhi.auth.entity.User;
@@ -16,6 +17,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -111,5 +113,19 @@ public class AuthService {
             throw new RuntimeException("token expired");
         }
         return true;
+    }
+
+    public UserDetailsResponse getUserDetails(Long userId) {
+
+        System.out.println("long userid "+userId+" ");
+        User user=userRepository.getById(userId);
+        return UserDetailsResponse
+                .builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 }

@@ -4,7 +4,6 @@ package com.abhi.auth.controller;
 import com.abhi.auth.common.ApiResponse;
 import com.abhi.auth.dto.request.LoginRequest;
 import com.abhi.auth.dto.request.RegisterRequest;
-import com.abhi.auth.dto.response.AuthResponse;
 import com.abhi.auth.entity.Token;
 import com.abhi.auth.service.AuthService;
 import io.micrometer.tracing.Tracer;
