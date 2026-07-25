@@ -15,6 +15,12 @@ import java.time.LocalDateTime;
 public class TransferEvent {
     private Long senderUserId;
     private Long receiverUserId;
+
+    private String senderName;
+    private String senderEmail;
+    private String receiverName;
+    private String receiverEmail;
+
     private BigDecimal amount;
     private String referenceId;
     private LocalDateTime transferredAt;

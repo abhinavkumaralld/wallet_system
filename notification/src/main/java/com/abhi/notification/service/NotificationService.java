@@ -22,10 +22,10 @@ public class NotificationService {
 
     private final JavaMailSender javaMailSender;
 
-    @Value("${spring.mail.username}")
-    private  String fromMail;
-    @Value("${spring.mail.to-username}")
-    private  String toMail;
+//    @Value("${spring.mail.username}")
+//    private  String fromMail;
+//    @Value("${spring.mail.to-username}")
+//    private  String toMail;
 
     public NotificationService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
@@ -47,9 +47,9 @@ public class NotificationService {
         log.info("sending mail  {}",transferEvent.toString());
 
         SimpleMailMessage simpleMailMessage=new SimpleMailMessage();
-        simpleMailMessage.setFrom(fromMail);
+        simpleMailMessage.setFrom(transferEvent.getSenderEmail());
         simpleMailMessage.setSubject("Transaction successful");
-        simpleMailMessage.setTo(toMail);
+        simpleMailMessage.setTo(transferEvent.getReceiverEmail());
         simpleMailMessage.setText(buildEmailBody(transferEvent));
 
         javaMailSender.send(simpleMailMessage);
@@ -63,11 +63,15 @@ public class NotificationService {
     }
     private String buildEmailBody(TransferEvent event) {
         return String.format(
-                "Dear User,\n\n" +
+                "Dear ," +event.getReceiverName()+
+                        "\n\n" +
                         "Your transfer of Rs. %s was successful.\n" +
                         "Reference ID: %s\n" +
                         "Date: %s\n\n" +
-                        "Thank you.",
+                        "Thank you."+
+                        "\n"+
+                        event.getSenderName()
+                ,
                 event.getAmount(),
                 event.getReferenceId(),
                 event.getTransferredAt()
