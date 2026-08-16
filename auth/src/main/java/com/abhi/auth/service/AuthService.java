@@ -120,7 +120,7 @@ public class AuthService {
 
         System.out.println("long userid "+userId+" ");
         User user=userRepository.getById(userId);
-        return UserDetailsResponse
+        UserDetailsResponse userDetailsResponse= UserDetailsResponse
                 .builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -129,5 +129,7 @@ public class AuthService {
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .build();
+        log.info(String.valueOf(userDetailsResponse));
+        return userDetailsResponse;
     }
 }
