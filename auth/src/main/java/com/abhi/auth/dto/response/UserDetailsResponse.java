@@ -1,6 +1,8 @@
 package com.abhi.auth.dto.response;
 
+import com.abhi.auth.common.MaskAttribute;
 import com.abhi.auth.common.Role;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +21,9 @@ public class UserDetailsResponse {
     private String name;
 
     private String email;
+
+    @JsonSerialize(using = MaskAttribute.class)
+    private String mobile;
 
     private Role role;
 

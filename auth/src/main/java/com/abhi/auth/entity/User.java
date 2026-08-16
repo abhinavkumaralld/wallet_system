@@ -1,6 +1,8 @@
 package com.abhi.auth.entity;
 
+import com.abhi.auth.common.AesConverter;
 import com.abhi.auth.common.ApiResponse;
+import com.abhi.auth.common.CryptoService;
 import com.abhi.auth.common.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,10 @@ public class User {
 
     @Column(nullable = false,unique = true)
     private String email;
+
+    @Column(nullable = true)
+    @Convert(converter = AesConverter.class)
+    private String mobile;
 
     @Column(nullable = false)
     private  String password;

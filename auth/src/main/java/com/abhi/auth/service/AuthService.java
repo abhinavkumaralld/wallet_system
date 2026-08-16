@@ -45,6 +45,7 @@ public class AuthService {
         User newUser=User.builder().email(registerRequest.getEmail())
                 .name(registerRequest.getName())
                 .password(bCryptPasswordEncoder.encode(registerRequest.getPassword()))
+                .mobile(registerRequest.getMobile())
                 .role(Role.USER)
                 .build();
         User user1=userRepository.save(newUser);
@@ -124,6 +125,7 @@ public class AuthService {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .mobile(user.getMobile())
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .build();
